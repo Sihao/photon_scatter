@@ -29,4 +29,4 @@ class Medium:
     # Path length calculation based on scattering length
     # Path length distribution follows Beer's law
     def get_path_length(self):
-        return - np.log(rand()) / self.mu_s
+        return - np.log(rand()) / (self.mu_s + self.mu_a)
