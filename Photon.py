@@ -17,16 +17,21 @@ class Photon:
         self.theta_i = rand() * np.pi
         self.phi = rand() * 2 * np.pi
 
+        # Properties for position and path length
         self.current_pos = start_pos
         self.new_pos = []
+        self.total_path = 0
+        self.path = start_pos
+
+
+        # Medium photon is propagating through (defines interface)
         self.medium = medium
 
         # Reflection probability
         self.P_r = []
 
         self.is_propagating = True
-        self.total_path = 0
-        self.path = start_pos
+
 
 
     def next_pos(self):
