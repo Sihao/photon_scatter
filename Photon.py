@@ -22,6 +22,7 @@ class Photon:
         self.new_pos = []
         self.total_path = 0
         self.path = start_pos
+        self.current_path_length = []
 
         # Initial photon weight
         self.W = 1
@@ -46,10 +47,11 @@ class Photon:
         """
         Sets new_pos depending on current position, direction and path length
         """
+        self.current_path_length = self.medium.get_path_length()
 
-        new_x = self.current_pos[0] + (self.medium.path_length * np.sin(self.theta_i) * np.cos(self.phi))
-        new_y = self.current_pos[1] + (self.medium.path_length * np.sin(self.theta_i) * np.sin(self.phi))
-        new_z = self.current_pos[2] + (self.medium.path_length * np.cos(self.theta_i))
+        new_x = self.current_pos[0] + (self.current_path_length * np.sin(self.theta_i) * np.cos(self.phi))
+        new_y = self.current_pos[1] + (self.current_path_length * np.sin(self.theta_i) * np.sin(self.phi))
+        new_z = self.current_pos[2] + (self.current_path_length * np.cos(self.theta_i))
 
         self.new_pos = np.array([new_x, new_y, new_z])
 
@@ -153,7 +155,7 @@ class Photon:
         out_of_bounds = self.check_boundary()
 
         # Increment total path length
-        self.total_path = self.total_path + self.medium.path_length
+        self.total_path = self.total_path + self.current_path_length
 
         if out_of_bounds:
             if self.is_reflected():
