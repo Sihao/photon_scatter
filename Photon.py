@@ -23,6 +23,14 @@ class Photon:
         self.total_path = 0
         self.path = start_pos
 
+        # Initial photon weight
+        self.W = 1
+
+        # Weight threshold before discarding photon
+        self.weight_threshold = 0.001
+
+        # Roulette parameter to maintain photon after crossing weight threshold
+        self.m = 10
 
         # Medium photon is propagating through (defines interface)
         self.medium = medium
@@ -30,9 +38,9 @@ class Photon:
         # Reflection probability
         self.P_r = []
 
+        # Photon state
         self.is_propagating = True
-
-
+        self.is_absorbed = False
 
     def next_pos(self):
         """
@@ -55,7 +63,8 @@ class Photon:
         (new_x, new_y, new_z) = self.new_pos
         (medium_x, medium_y, medium_z) = self.medium.shape
 
-        if (new_x < -float('inf') or new_x > medium_x or new_y < -float('inf') or new_y > medium_y or new_z < 0 or new_z > medium_z):
+        if (new_x < -float('inf') or new_x > medium_x or new_y < -float(
+                'inf') or new_y > medium_y or new_z < 0 or new_z > medium_z):
 
             return True
         else:
@@ -112,11 +121,29 @@ class Photon:
         # Azimuthal angle (phi) randomly distributed between 0 and 2 * \pi
         self.phi = 2 * np.pi * rand()
 
+    def absorb(self):
+        """
+        Decrease photon weight based on absorption and scattering coefficient
+        Sets photon weight W.
+        """
+        self.W = self.W - (self.medium.mu_a / self.medium.mu_s) * self.W
+
+        if self.W < self.weight_threshold:
+            self.roulette()
+
+    def roulette(self):
+        if rand() < 1 / self.m:
+            self.W = self.m * self.W
+        else:
+            self.W = 0
+            self.is_absorbed = True
+
     def propagate(self):
         """
         Perform one propagation step of photon through medium
         Sets current_pos to new_pos, sets new direction depending on scattering, reflection or refraction. Sets
-        is_propagating to false if photon exits medium.
+        is_propagating to False if photon exits medium. Reduces photon weight based on absorption and scattering
+        coefficient and sets is_absorbed to True when photon is absorbed.
         """
 
         # Calculate next position
@@ -146,8 +173,8 @@ class Photon:
 
                 # Change propagation direction after reflection (Prahl '89)
                 self.theta_i = np.pi - self.theta_i
+                self.absorb()
                 self.scatter()
-
 
             # If photon leaves the self.medium
             else:
@@ -172,4 +199,5 @@ class Photon:
             self.path = np.vstack((self.path, self.new_pos))
             self.current_pos = self.new_pos
 
+            self.absorb()
             self.scatter()
