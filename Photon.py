@@ -64,21 +64,29 @@ class Photon:
 
         theta_i = self.theta_i
 
-        # Calculate external angle based on Snell's Law
-        theta_e = np.arcsin((self.medium.N_i / self.medium.N_e) * np.sin(theta_i))
+        # Calculate critical angle
+        theta_crit = np.arcsin(self.medium.N_e / self.medium.N_i)
 
-        # Reflection probability is determined by the Fresnel reflection coefficient
-        r_par = (self.medium.N_i * np.cos(theta_i) - self.medium.N_e * np.cos(theta_e)) / (
-                self.medium.N_i * np.cos(theta_i) + self.medium.N_e * np.cos(theta_e))
+        # All angles greater than critical angle will be reflected
+        if theta_i > theta_crit:
+            self.P_r = 1
 
-        r_perp = (self.medium.N_i * np.cos(theta_e) - self.medium.N_e * np.cos(theta_i)) / (
-                self.medium.N_i * np.cos(theta_e) + self.medium.N_e * np.cos(theta_i))
+        else:
+            # Calculate external angle based on Snell's Law
+            theta_e = np.arcsin((self.medium.N_i / self.medium.N_e) * np.sin(theta_i))
 
-        self.P_r = (r_par ** 2 + r_perp ** 2) / 2
+            # Reflection probability is determined by the Fresnel reflection coefficient
+            r_par = (self.medium.N_i * np.cos(theta_i) - self.medium.N_e * np.cos(theta_e)) / (
+                    self.medium.N_i * np.cos(theta_i) + self.medium.N_e * np.cos(theta_e))
+
+            r_perp = (self.medium.N_i * np.cos(theta_e) - self.medium.N_e * np.cos(theta_i)) / (
+                    self.medium.N_i * np.cos(theta_e) + self.medium.N_e * np.cos(theta_i))
+
+            self.P_r = (r_par ** 2 + r_perp ** 2) / 2
 
     def is_reflected(self):
         """
-        Determine whether photon is actually reflected based on reflection probability P_r
+        Determine whether photon is actually reflected based on reflection probability P_r and angle of incidence
         :return: True if photon is reflected, False otherwise.
         """
         self.calc_reflection_prob()
