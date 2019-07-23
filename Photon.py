@@ -56,10 +56,10 @@ class Photon:
         else:
             return False
 
-    def calc_reflection_prob(self):
+    def is_reflected(self):
         """
-        Calculate the probability that photon is reflected when at boundary.
-        Sets P_r property.
+        Determine whether photon is actually reflected based on reflection probability P_r and angle of incidence
+        :return: True if photon is reflected, False otherwise.
         """
 
         theta_i = self.theta_i
@@ -83,13 +83,6 @@ class Photon:
                     self.medium.N_i * np.cos(theta_e) + self.medium.N_e * np.cos(theta_i))
 
             self.P_r = (r_par ** 2 + r_perp ** 2) / 2
-
-    def is_reflected(self):
-        """
-        Determine whether photon is actually reflected based on reflection probability P_r and angle of incidence
-        :return: True if photon is reflected, False otherwise.
-        """
-        self.calc_reflection_prob()
 
         if rand() < self.P_r:
             return True
