@@ -196,7 +196,7 @@ class Photon:
                 # Rotate final position in accordance with refraction
                 R_z = np.array(
                     [[np.cos(rotation), -np.sin(rotation), 0], [np.sin(rotation), np.cos(rotation), 0], [0, 0, 1]])
-                self.new_pos = (np.matmul(R_z, np.array([[self.new_pos[0]], [self.new_pos[1]], [self.new_pos[2]]]))).T
+                self.new_pos = (np.matmul(R_z, np.array([[self.new_pos[0]], [self.new_pos[1]], [self.new_pos[2]]]))).T[0]
 
                 self.theta_i = theta_refracted
                 self.path = np.vstack((self.path, self.new_pos))
