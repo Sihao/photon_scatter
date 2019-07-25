@@ -118,17 +118,19 @@ class Photon:
 
         else:
             # Polar angle (theta) anisotropic scattering determined by Henyey-Greenstein phase function
-            self.theta_i = np.arccos((1 + g ** 2 - ((1 - g ** 2) / (1 + g - 2 * g * rand())) ** 2) / 2 * g)
+            self.theta_i = np.arccos((1 + g ** 2 - ((1 - g ** 2) / (1 - g + 2 * g * rand())) ** 2) / 2 * g)
+
 
         # Azimuthal angle (phi) randomly distributed between 0 and 2 * \pi
         self.phi = 2 * np.pi * rand()
+        print("Theta:%f, Phi:%f" % (self.theta_i, self.phi))
 
     def absorb(self):
         """
         Decrease photon weight based on absorption and scattering coefficient
         Sets photon weight W.
         """
-        self.W = self.W - (self.medium.mu_a / self.medium.mu_s) * self.W
+        self.W = self.W - (self.medium.mu_a / (self.medium.mu_s + self.medium.mu_a)) * self.W
 
         if self.W < self.weight_threshold:
             self.roulette()
