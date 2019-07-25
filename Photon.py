@@ -112,18 +112,24 @@ class Photon:
         """
         g = self.medium.g
 
+
+        # Calculate angle between scattered direction and original direction
         # If scattering is isotropic then polar angle is randomly distributed between 0 and \pi
         if g == 0:
-            self.theta_i = np.cos(2 * rand() - 1)
+            theta_scatter = np.arccos(2 * rand() - 1)
 
         else:
             # Polar angle (theta) anisotropic scattering determined by Henyey-Greenstein phase function
-            self.theta_i = np.arccos((1 + g ** 2 - ((1 - g ** 2) / (1 - g + 2 * g * rand())) ** 2) / 2 * g)
+            theta_scatter = np.arccos((1 + g ** 2 - ((1 - g ** 2) / (1 - g + 2 * g * rand())) ** 2) / 2 * g)
 
+        # Compute new direction
+        theta_new = self.theta_i + theta_scatter
+
+        # Map new angle to [0, \pi] range
+        self.theta_i = np.abs(np.arctan2(np.sin(theta_new), np.cos(theta_new)))
 
         # Azimuthal angle (phi) randomly distributed between 0 and 2 * \pi
         self.phi = 2 * np.pi * rand()
-        print("Theta:%f, Phi:%f" % (self.theta_i, self.phi))
 
     def absorb(self):
         """
