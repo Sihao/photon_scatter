@@ -84,12 +84,16 @@ class Photon:
         theta_crit = np.arcsin(self.medium.N_e / self.medium.N_i)
 
         # All angles greater than critical angle will be reflected
-        if theta_i > theta_crit:
+        if theta_crit < theta_i < np.pi / 2 or theta_crit < np.pi - theta_i < np.pi / 2:
             self.P_r = 1
 
         else:
             # Calculate external angle based on Snell's Law
             theta_e = np.arcsin((self.medium.N_i / self.medium.N_e) * np.sin(theta_i))
+
+            # Correct computed refracted angle if photon is hitting the bottom boundary
+            if theta_i > np.pi / 2:
+                theta_e = np.pi - theta_e
 
             # Reflection probability is determined by the Fresnel reflection coefficient
             r_par = (self.medium.N_i * np.cos(theta_i) - self.medium.N_e * np.cos(theta_e)) / (
@@ -189,6 +193,10 @@ class Photon:
             # If photon leaves the self.medium
             else:
                 theta_refracted = np.arcsin(self.medium.N_i / self.medium.N_e * np.sin(self.theta_i))
+
+                # Correct computed refracted angle if photon is hitting the bottom boundary
+                if self.theta_i > np.pi / 2:
+                    theta_refracted = np.pi - theta_refracted
 
                 # Construct rotation matrix
                 rotation = self.theta_i - theta_refracted
