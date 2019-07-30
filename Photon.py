@@ -14,8 +14,16 @@ class Photon:
         """
 
         # Random initial direction
-        self.theta_i = rand() * np.pi
-        self.phi = rand() * 2 * np.pi
+        u = rand()
+        v = rand()
+
+        theta_i = np.arccos(2 * u - 1)
+        phi = 2 * np.pi * v
+
+        # Direction cosines
+        self.mu_x = np.sin(theta_i) * np.cos(phi)
+        self.mu_y = np.sin(theta_i) * np.sin(phi)
+        self.mu_z = np.cos(theta_i)
 
         # Properties for position and path length
         self.current_pos = start_pos
@@ -43,15 +51,19 @@ class Photon:
         self.is_propagating = True
         self.is_absorbed = False
 
+        # self.thetas = [self.theta_i]
+        # self.ax = plt.axes(projection='3d')
+
+
     def next_pos(self):
         """
         Sets new_pos depending on current position, direction and path length
         """
         self.current_path_length = self.medium.get_path_length()
 
-        new_x = self.current_pos[0] + (self.current_path_length * np.sin(self.theta_i) * np.cos(self.phi))
-        new_y = self.current_pos[1] + (self.current_path_length * np.sin(self.theta_i) * np.sin(self.phi))
-        new_z = self.current_pos[2] + (self.current_path_length * np.cos(self.theta_i))
+        new_x = self.current_pos[0] + (self.current_path_length * self.mu_x)
+        new_y = self.current_pos[1] + (self.current_path_length * self.mu_y)
+        new_z = self.current_pos[2] + (self.current_path_length * self.mu_z)
 
         self.new_pos = np.array([new_x, new_y, new_z])
 
@@ -78,7 +90,7 @@ class Photon:
         :return: True if photon is reflected, False otherwise.
         """
 
-        theta_i = self.theta_i
+        theta_i = np.arccos(self.mu_z)
 
         # Calculate critical angle
         theta_crit = np.arcsin(self.medium.N_e / self.medium.N_i)
@@ -116,7 +128,6 @@ class Photon:
         """
         g = self.medium.g
 
-
         # Calculate angle between scattered direction and original direction
         # If scattering is isotropic then polar angle is randomly distributed between 0 and \pi
         if g == 0:
@@ -126,14 +137,16 @@ class Photon:
             # Polar angle (theta) anisotropic scattering determined by Henyey-Greenstein phase function
             theta_scatter = np.arccos((1 + g ** 2 - ((1 - g ** 2) / (1 - g + 2 * g * rand())) ** 2) / 2 * g)
 
-        # Compute new direction
-        theta_new = self.theta_i + theta_scatter
+        phi = 2 * np.pi * rand()
 
-        # Map new angle to [0, \pi] range
-        self.theta_i = np.abs(np.arctan2(np.sin(theta_new), np.cos(theta_new)))
+        self.mu_x = (np.sin(theta_scatter) / np.sqrt(1 - self.mu_z ** 2)) * (
+                self.mu_x * self.mu_z * np.cos(phi) - self.mu_y * np.sin(phi)) + self.mu_x * np.cos(theta_scatter)
+        self.mu_y = (np.sin(theta_scatter) / np.sqrt(1 - self.mu_z ** 2)) * (
+                self.mu_y * self.mu_z * np.cos(phi) + self.mu_x * np.sin(phi)) + self.mu_y * np.cos(theta_scatter)
+        self.mu_z = - np.sin(theta_scatter) * np.cos(phi) * np.sqrt(1 - self.mu_z ** 2) + self.mu_z * np.cos(
+            theta_scatter)
 
-        # Azimuthal angle (phi) randomly distributed between 0 and 2 * \pi
-        self.phi = 2 * np.pi * rand()
+        # self.thetas = np.append(self.thetas, theta_scatter)
 
     def absorb(self):
         """
@@ -186,30 +199,34 @@ class Photon:
                 self.current_pos = self.new_pos
 
                 # Change propagation direction after reflection (Prahl '89)
-                self.theta_i = np.pi - self.theta_i
+                self.mu_z = - self.mu_z
                 self.absorb()
                 self.scatter()
 
             # If photon leaves the self.medium
             else:
-                theta_refracted = np.arcsin(self.medium.N_i / self.medium.N_e * np.sin(self.theta_i))
+                theta_i = np.arccos(self.mu_z)
+                theta_refracted = np.arcsin(self.medium.N_i / self.medium.N_e * np.sin(theta_i))
 
                 # Correct computed refracted angle if photon is hitting the bottom boundary
-                if self.theta_i > np.pi / 2:
+                if theta_i > np.pi / 2:
                     theta_refracted = np.pi - theta_refracted
 
                 # Construct rotation matrix
-                rotation = self.theta_i - theta_refracted
+                rotation = theta_i - theta_refracted
 
                 # Rotate final position in accordance with refraction
                 R_z = np.array(
                     [[np.cos(rotation), -np.sin(rotation), 0], [np.sin(rotation), np.cos(rotation), 0], [0, 0, 1]])
-                self.new_pos = (np.matmul(R_z, np.array([[self.new_pos[0]], [self.new_pos[1]], [self.new_pos[2]]]))).T[0]
+                self.new_pos = (np.matmul(R_z, np.array([[self.new_pos[0]], [self.new_pos[1]], [self.new_pos[2]]]))).T[
+                    0]
 
-                self.theta_i = theta_refracted
-                self.path = np.vstack((self.path, self.new_pos))
+                self.mu_x = np.cos(theta_refracted) * self.mu_x
+                self.mu_y = np.cos(theta_refracted) * self.mu_y
+                self.mu_z = np.cos(theta_refracted) * self.mu_z
 
                 self.current_pos = self.new_pos
+                self.path = np.vstack((self.path, self.new_pos))
                 self.is_propagating = False
 
         # Set current position to new calculated position if photon is still in medium
