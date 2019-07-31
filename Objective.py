@@ -12,5 +12,16 @@ class Objective:
         self.theta = np.arcsin(self.NA / self.n)
 
     def photon_accepted(self, photon):
-        planar_distance = np.cos(self.theta) * self.working_distance
+        # Determine Z-position of aperture opening
+        aperture_z = np.cos(self.theta) * self.working_distance
 
+        # Compute (X, Y) position of photon at height of aperture opening
+        photon_x = ((aperture_z - photon.current_pos[2]) / photon.mu_z) * photon.mu_x + photon.current_pos[0]
+        photon_y = ((aperture_z - photon.current_pos[2]) / photon.mu_z) * photon.mu_y + photon.current_pos[1]
+
+        # Assume aperture opening is a circle centred at (0, 0, aperture_z)
+        # Check if computed photon position is within this circle
+        if photon_x ** 2 + photon_y ** 2 < (self.front_aperture / 2) ** 2:
+            return True
+        else:
+            return False
