@@ -90,14 +90,18 @@ def plot_photons(photons, objective):
     return fig
 
 
-def plot_fov_heatmap(acceptance_matrix):
+def plot_fov_heatmap(acceptance_matrix, fov):
     fig = go.Figure(data=go.Heatmap(
+        x=fov,
+        y=fov,
         z=acceptance_matrix)
     )
 
     fig.update_layout(yaxis=dict(
         scaleanchor="x",
-        scaleratio=1, )
+        scaleratio=1,
+
+        )
     )
 
     return fig
