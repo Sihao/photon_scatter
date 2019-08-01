@@ -1,11 +1,6 @@
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib as mpl
-from mpl_toolkits.mplot3d import Axes3D
-import seaborn as sns
 from itertools import compress
 import plotly.graph_objects as go
-import plotly
 
 from Photon import Photon
 
