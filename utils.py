@@ -112,8 +112,13 @@ def plot_photon_path(photon):
                 marker=dict(
                     size=3,
                     opacity=0.8,
-                    color=np.array(range(0, len(photon.path))) / len(photon.path),  # set color to an array/list of desired values
+                    color=np.array(range(0, len(photon.path))) / (len(photon.path) - 1),  # set color to an array/list of desired values
                     colorscale='Viridis',  # choose a colorscale
+                    colorbar=dict(
+                        thickness=20,
+                        tickmode='array',
+                        tickvals=[0, 1],
+                        ticktext=["Start", "End"])
                 ),
                 line=dict(
                     color='#1f77b4',
