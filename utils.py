@@ -68,19 +68,29 @@ def plot_photons(photons, objective):
     # Get coordinates of rejected photons
     rejected_positions = np.array([photon.path[-1] for photon in rejected_photons])
 
-    fig = go.Figure(
-        data=[go.Scatter3d(x=accepted_positions[:, 0], y=accepted_positions[:, 1], z=accepted_positions[:, 2],
-                           mode='markers', marker=dict(
-                size=3,
-                opacity=0.8,
-                color='green'
-            ))])
-    fig.add_trace(go.Scatter3d(x=rejected_positions[:, 0], y=rejected_positions[:, 1], z=rejected_positions[:, 2],
+    try:
+        fig = go.Figure(
+            data=[go.Scatter3d(x=accepted_positions[:, 0], y=accepted_positions[:, 1], z=accepted_positions[:, 2],
                                mode='markers', marker=dict(
-            size=3,
-            opacity=0.2,
-            color='red'
-        )))
+                    size=3,
+                    opacity=0.8,
+                    color='green'
+                ))])
+        fig.add_trace(go.Scatter3d(x=rejected_positions[:, 0], y=rejected_positions[:, 1], z=rejected_positions[:, 2],
+                                   mode='markers', marker=dict(
+                size=3,
+                opacity=0.2,
+                color='red'
+            )))
+    except IndexError:
+        fig = go.Figure(
+            data=[go.Scatter3d(x=rejected_positions[:, 0], y=rejected_positions[:, 1], z=rejected_positions[:, 2],
+                                   mode='markers', marker=dict(
+                size=3,
+                opacity=0.2,
+                color='red'
+            ))]
+        )
 
     return fig
 
