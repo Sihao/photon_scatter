@@ -5,12 +5,6 @@ import plotly.graph_objects as go
 from Photon import Photon
 
 
-def parallel_sim(medium, num_photons):
-    result = [single_sim(medium) for _ in range(num_photons)]
-
-    return result
-
-
 def fov_sim(medium, fov, num_photons, depth, omit_bottom=False):
     result = []
     for i in fov:
