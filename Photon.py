@@ -89,9 +89,9 @@ class Photon:
             theta_refracted = np.pi - theta_refracted
 
         # Calculate new direction cosines
-        mu_x = np.sin(theta_refracted) * np.cos(theta_refracted)
-        mu_y = np.sin(theta_refracted) * np.sin(theta_refracted)
-        mu_z = np.cos(theta_refracted)
+        mu_x = np.cos(theta_refracted) * self.mu_x
+        mu_y = np.cos(theta_refracted) * self.mu_y
+        mu_z = np.cos(theta_refracted) * self.mu_z
 
         # Propagate remaining path length with new direction cosines
         path_remaining = self.current_path_length - path_to_boundary
