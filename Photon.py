@@ -54,7 +54,6 @@ class Photon:
         # self.thetas = [self.theta_i]
         # self.ax = plt.axes(projection='3d')
 
-
     def next_pos(self):
         """
         Sets new_pos depending on current position, direction and path length
@@ -66,6 +65,40 @@ class Photon:
         new_z = self.current_pos[2] + (self.current_path_length * self.mu_z)
 
         self.new_pos = np.array([new_x, new_y, new_z])
+
+    def refracted_position(self):
+        # Calculate path length to boundary
+        if self.new_pos[2] > self.medium.shape[2]:
+            boundary_z = self.medium.shape[2]
+        elif self.new_pos[2] < 0:
+            boundary_z = 0
+
+        path_to_boundary = (boundary_z - self.current_pos[2]) / self.mu_z
+
+        # Propagate to boundary
+        boundary_x = self.current_pos[0] + (path_to_boundary * self.mu_x)
+        boundary_y = self.current_pos[1] + (path_to_boundary * self.mu_y)
+
+        # Calculate new direction cosines
+        theta_i = np.arccos(self.mu_z)
+        theta_refracted = np.arcsin(self.medium.N_i / self.medium.N_e * np.sin(theta_i))
+
+        # Correct computed refracted angle if photon is hitting the bottom boundary
+        if theta_i > np.pi / 2:
+            theta_refracted = np.pi - theta_refracted
+
+        # Calculate new direction cosines
+        mu_x = np.sin(theta_refracted) * np.cos(theta_refracted)
+        mu_y = np.sin(theta_refracted) * np.sin(theta_refracted)
+        mu_z = np.cos(theta_refracted)
+
+        # Propagate remaining path length with new direction cosines
+        path_remaining = self.current_path_length - path_to_boundary
+        refracted_x = boundary_x + (path_remaining * mu_x)
+        refracted_y = boundary_y + (path_remaining * mu_y)
+        refracted_z = boundary_z + (path_remaining * mu_z)
+
+        self.new_pos = np.array([refracted_x, refracted_y, refracted_z])
 
     def check_boundary(self):
         """
@@ -205,25 +238,7 @@ class Photon:
 
             # If photon leaves the self.medium
             else:
-                theta_i = np.arccos(self.mu_z)
-                theta_refracted = np.arcsin(self.medium.N_i / self.medium.N_e * np.sin(theta_i))
-
-                # Correct computed refracted angle if photon is hitting the bottom boundary
-                if theta_i > np.pi / 2:
-                    theta_refracted = np.pi - theta_refracted
-
-                # Construct rotation matrix
-                rotation = theta_i - theta_refracted
-
-                # Rotate final position in accordance with refraction
-                R_z = np.array(
-                    [[np.cos(rotation), -np.sin(rotation), 0], [np.sin(rotation), np.cos(rotation), 0], [0, 0, 1]])
-                self.new_pos = (np.matmul(R_z, np.array([[self.new_pos[0]], [self.new_pos[1]], [self.new_pos[2]]]))).T[
-                    0]
-
-                self.mu_x = np.cos(theta_refracted) * self.mu_x
-                self.mu_y = np.cos(theta_refracted) * self.mu_y
-                self.mu_z = np.cos(theta_refracted) * self.mu_z
+                self.refracted_position()
 
                 self.current_pos = self.new_pos
                 self.path = np.vstack((self.path, self.new_pos))
