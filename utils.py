@@ -11,43 +11,48 @@ def parallel_sim(medium, num_photons):
     return result
 
 
-def fov_sim(medium, fov, num_photons, depth=170):
+def fov_sim(medium, fov, num_photons, depth, omit_bottom=False):
     result = []
     for i in fov:
         result_j = []
         for j in fov:
-            result_j.append([single_sim(medium, np.array([i, j, depth])) for _ in range(num_photons)])
+            fov_row = [single_sim(medium, np.array([i, j, depth]), omit_bottom) for _ in range(num_photons)]
+            fov_row = list(filter(None, fov_row))
+            result_j.append(fov_row)
         result.append(result_j)
 
     return result
 
 
-def single_sim(medium, start_pos):
+def single_sim(medium, start_pos, omit_bottom=False):
 
     photon = Photon(start_pos, medium)
 
     while photon.is_propagating and not photon.is_absorbed:
-        photon.propagate()
+        photon.propagate(omit_bottom)
     # print('Path length: %f' %photon.total_path)
 
-    return photon
+    if photon.is_omitted or photon.is_absorbed:
+        return None
+    else:
+        return photon
 
 
-def calc_acceptance_ratio(photons, objective, num_photons):
+def calc_acceptance_ratio(photons, objective):
     # Filter accepted photons
     acceptance_list = list(map(objective.photon_accepted, photons))
     accepted_photons = list(compress(photons, acceptance_list))
     accepted_positions = np.array([photon.path[-1] for photon in accepted_photons])
 
-    ratio = len(accepted_positions) / num_photons
+    ratio = len(accepted_positions) / len(photons)
 
     return ratio
 
 
-def calc_acceptance_matrix(fov_photon_matrix, objective, num_photons):
+def calc_acceptance_matrix(fov_photon_matrix, objective):
     acceptance_matrix = np.reshape(
         np.array(
-            [calc_acceptance_ratio(fov_spot, objective, num_photons) for fov_row in fov_photon_matrix for fov_spot in
+            [calc_acceptance_ratio(fov_spot, objective) for fov_row in fov_photon_matrix for fov_spot in
              fov_row]),
         (len(fov_photon_matrix), len(fov_photon_matrix[0])))
 

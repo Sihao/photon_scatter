@@ -50,6 +50,7 @@ class Photon:
         # Photon state
         self.is_propagating = True
         self.is_absorbed = False
+        self.is_omitted = False
 
         # self.thetas = [self.theta_i]
         # self.ax = plt.axes(projection='3d')
@@ -198,7 +199,7 @@ class Photon:
             self.W = 0
             self.is_absorbed = True
 
-    def propagate(self):
+    def propagate(self, omit_bottom=False):
         """
         Perform one propagation step of photon through medium
         Sets current_pos to new_pos, sets new direction depending on scattering, reflection or refraction. Sets
@@ -238,11 +239,15 @@ class Photon:
 
             # If photon leaves the self.medium
             else:
-                self.refracted_position()
+                if omit_bottom and self.new_pos[2] < 0:
+                    self.is_propagating = False
+                    self.is_omitted = True
+                else:
+                    self.refracted_position()
 
-                self.current_pos = self.new_pos
-                self.path = np.vstack((self.path, self.new_pos))
-                self.is_propagating = False
+                    self.current_pos = self.new_pos
+                    self.path = np.vstack((self.path, self.new_pos))
+                    self.is_propagating = False
 
         # Set current position to new calculated position if photon is still in medium
         else:
