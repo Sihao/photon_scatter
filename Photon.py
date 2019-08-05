@@ -90,9 +90,9 @@ class Photon:
             theta_refracted = np.pi - theta_refracted
 
         # Calculate new direction cosines
-        self.mu_x = np.cos(theta_refracted) * self.mu_x
-        self.mu_y = np.cos(theta_refracted) * self.mu_y
-        self.mu_z = np.cos(theta_refracted) * self.mu_z
+        self.mu_x = np.sin(theta_refracted) * self.mu_x / np.sin(theta_i)
+        self.mu_y = np.sin(theta_refracted) * self.mu_y / np.sin(theta_i)
+        self.mu_z = np.cos(theta_refracted)
 
         # Propagate remaining path length with new direction cosines
         path_remaining = self.current_path_length - path_to_boundary
@@ -181,6 +181,14 @@ class Photon:
                 self.mu_y * self.mu_z * np.cos(phi) + self.mu_x * np.sin(phi)) + self.mu_y * np.cos(theta_scatter)
         self.mu_z = - np.sin(theta_scatter) * np.cos(phi) * np.sqrt(1 - self.mu_z ** 2) + self.mu_z * np.cos(
             theta_scatter)
+
+        def normalize(v):
+            norm = np.linalg.norm(v, ord=2)
+            if norm == 0:
+                norm = np.finfo(v.dtype).eps
+            return v / norm
+
+        [self.mu_x, self.mu_y, self.mu_z] = normalize([self.mu_x, self.mu_y, self.mu_z])
 
         self.direction_cosines.append((self.mu_x, self.mu_y, self.mu_z))
         # self.thetas = np.append(self.thetas, theta_scatter)
