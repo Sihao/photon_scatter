@@ -1,6 +1,7 @@
 import numpy as np
 from itertools import compress
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 from Photon import Photon
 
@@ -212,5 +213,21 @@ def plot_photon_path(photon):
     # ax = plt.axes(projection='3d')
     # ax.scatter(photon.path[:, 0], photon.path[:, 1], photon.path[:, 2], s=5)
     # ax.plot(photon.path[:, 0], photon.path[:, 1], photon.path[:, 2])
+
+    return fig
+
+
+def plot_axial_paths(photons):
+    fig = make_subplots(rows=1, cols=2, subplot_titles=["X-Z Plane", "Y-Z Plane"])
+
+    for photon in photons:
+        fig.add_trace(go.Scatter(x=photon.path[:, 0], y=photon.path[:, 2],
+                                 mode='lines',
+                                 name='lines'),
+                      row=1, col=1)
+        fig.add_trace(go.Scatter(x=photon.path[:, 1], y=photon.path[:, 2],
+                                 mode='lines',
+                                 name='lines'),
+                      row=1, col=2)
 
     return fig
