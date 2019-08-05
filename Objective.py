@@ -2,10 +2,11 @@ import numpy as np
 
 
 class Objective:
-    def __init__(self, numerical_aperture, working_distance, refractive_index=1):
+    def __init__(self, numerical_aperture, working_distance, sample_thickness, refractive_index=1):
         self.n = refractive_index
         self.NA = numerical_aperture
         self.working_distance = working_distance
+        self.sample_thickness = sample_thickness
 
         # Computed properties
         self.front_aperture = self.NA * 2 * self.working_distance
@@ -13,7 +14,7 @@ class Objective:
 
     def photon_accepted(self, photon):
         # Determine Z-position of aperture opening
-        aperture_z = np.cos(self.theta) * self.working_distance
+        aperture_z = np.cos(self.theta) * self.working_distance + self.sample_thickness
 
         # Only consider photons that didn't exit the bottom
         if photon.current_pos[2] > 0:
