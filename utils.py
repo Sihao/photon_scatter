@@ -66,20 +66,35 @@ def plot_photons(photons, objective, show_aperture=False):
     # Get coordinates of rejected photons
     rejected_positions = np.array([photon.path[-1] for photon in rejected_photons])
 
+    # Define constant colorscale
+    pl_red = [[0, '#bd1540'],
+              [1, '#bd1540']]
+
+    pl_green = [[0, '#009900'],
+               [1, '#009900']]
     try:
         fig = go.Figure(
-            data=[go.Scatter3d(x=accepted_positions[:, 0], y=accepted_positions[:, 1], z=accepted_positions[:, 2],
-                               mode='markers', marker=dict(
-                    size=3,
-                    opacity=0.8,
-                    color='green'
-                ))])
-        fig.add_trace(go.Scatter3d(x=rejected_positions[:, 0], y=rejected_positions[:, 1], z=rejected_positions[:, 2],
-                                   mode='markers', marker=dict(
-                size=3,
-                opacity=0.2,
-                color='red'
-            )))
+            data=[go.Cone(x=accepted_positions[:, 0], y=accepted_positions[:, 1], z=accepted_positions[:, 2],
+                              u=[photon.mu_x for photon in accepted_photons],
+                              v=[photon.mu_y for photon in accepted_photons],
+                              w=[photon.mu_z for photon in accepted_photons],
+                              anchor="center",
+                              colorscale=pl_green,
+                              hoverinfo="all",
+                              showscale=False,
+                              sizeref=3)]
+        )
+        fig.add_trace(go.Cone(x=rejected_positions[:, 0], y=rejected_positions[:, 1], z=rejected_positions[:, 2],
+                              u=[photon.mu_x for photon in rejected_photons],
+                              v=[photon.mu_y for photon in rejected_photons],
+                              w=[photon.mu_z for photon in rejected_photons],
+                              anchor="center",
+                              colorscale=pl_red,
+                              hoverinfo="all",
+                              showscale=False,
+                              sizeref=3)
+        )
+
     except IndexError:
         fig = go.Figure(
             data=[go.Scatter3d(x=rejected_positions[:, 0], y=rejected_positions[:, 1], z=rejected_positions[:, 2],
@@ -131,14 +146,52 @@ def plot_fov_heatmap(acceptance_matrix, fov):
 
 
 def plot_photon_path(photon):
+    # fig = go.Figure(
+    #     data=[go.Scatter3d(
+    #         x=photon.path[:, 0],
+    #         y=photon.path[:, 1],
+    #         z=photon.path[:, 2],
+    #         mode='lines+markers',
+    #         marker=dict(
+    #             size=3,
+    #             opacity=0.8,
+    #             color=np.array(range(0, len(photon.path))) / (len(photon.path) - 1),
+    #             # set color to an array/list of desired values
+    #             colorscale='Viridis',  # choose a colorscale
+    #             colorbar=dict(
+    #                 thickness=20,
+    #                 tickmode='array',
+    #                 tickvals=[0, 1],
+    #                 ticktext=["Start", "End"])
+    #         ),
+    #         line=dict(
+    #             color='#1f77b4',
+    #             width=5)
+    #     )]
+    # )
+
     fig = go.Figure(
-        data=[go.Scatter3d(
+        data=[go.Cone(x=photon.path[:, 0],
+                      y=photon.path[:, 1],
+                      z=photon.path[:, 2],
+                      u=[direction_cosine[0] for direction_cosine in photon.direction_cosines],
+                      v=[direction_cosine[1] for direction_cosine in photon.direction_cosines],
+                      w=[direction_cosine[2] for direction_cosine in photon.direction_cosines],
+                      anchor="tail",
+                      colorscale="Viridis",
+                      hoverinfo="all",
+                      showscale=False,
+                      sizemode="absolute",
+                      sizeref=.2)]
+    )
+
+    fig.add_trace(go.Scatter3d(
             x=photon.path[:, 0],
             y=photon.path[:, 1],
             z=photon.path[:, 2],
-            mode='lines+markers',
+            mode='lines',
             marker=dict(
-                size=3,
+                size=2,
                 opacity=0.8,
                 color=np.array(range(0, len(photon.path))) / (len(photon.path) - 1),
                 # set color to an array/list of desired values
@@ -152,7 +205,7 @@ def plot_photon_path(photon):
             line=dict(
                 color='#1f77b4',
                 width=5)
-        )]
+        )
     )
 
     # fig = plt.figure()
