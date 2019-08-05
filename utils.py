@@ -78,7 +78,7 @@ def plot_photons(photons, objective, show_aperture=False):
                               u=[photon.mu_x for photon in accepted_photons],
                               v=[photon.mu_y for photon in accepted_photons],
                               w=[photon.mu_z for photon in accepted_photons],
-                              anchor="center",
+                              anchor="tail",
                               colorscale=pl_green,
                               hoverinfo="all",
                               showscale=False,
@@ -88,7 +88,7 @@ def plot_photons(photons, objective, show_aperture=False):
                               u=[photon.mu_x for photon in rejected_photons],
                               v=[photon.mu_y for photon in rejected_photons],
                               w=[photon.mu_z for photon in rejected_photons],
-                              anchor="center",
+                              anchor="tail",
                               colorscale=pl_red,
                               hoverinfo="all",
                               showscale=False,
@@ -182,7 +182,7 @@ def plot_photon_path(photon):
                       hoverinfo="all",
                       showscale=False,
                       sizemode="absolute",
-                      sizeref=.2)]
+                      sizeref=3)]
     )
 
     fig.add_trace(go.Scatter3d(
