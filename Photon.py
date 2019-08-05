@@ -30,6 +30,7 @@ class Photon:
         self.new_pos = []
         self.total_path = 0
         self.path = start_pos
+        self.direction_cosines = [(self.mu_x, self.mu_y, self.mu_z)]
         self.current_path_length = []
 
         # Initial photon weight
@@ -89,16 +90,17 @@ class Photon:
             theta_refracted = np.pi - theta_refracted
 
         # Calculate new direction cosines
-        mu_x = np.cos(theta_refracted) * self.mu_x
-        mu_y = np.cos(theta_refracted) * self.mu_y
-        mu_z = np.cos(theta_refracted) * self.mu_z
+        self.mu_x = np.cos(theta_refracted) * self.mu_x
+        self.mu_y = np.cos(theta_refracted) * self.mu_y
+        self.mu_z = np.cos(theta_refracted) * self.mu_z
 
         # Propagate remaining path length with new direction cosines
         path_remaining = self.current_path_length - path_to_boundary
-        refracted_x = boundary_x + (path_remaining * mu_x)
-        refracted_y = boundary_y + (path_remaining * mu_y)
-        refracted_z = boundary_z + (path_remaining * mu_z)
+        refracted_x = boundary_x + (path_remaining * self.mu_x)
+        refracted_y = boundary_y + (path_remaining * self.mu_y)
+        refracted_z = boundary_z + (path_remaining * self.mu_z)
 
+        self.direction_cosines.append((self.mu_x, self.mu_y, self.mu_z))
         self.new_pos = np.array([refracted_x, refracted_y, refracted_z])
 
     def check_boundary(self):
@@ -180,6 +182,7 @@ class Photon:
         self.mu_z = - np.sin(theta_scatter) * np.cos(phi) * np.sqrt(1 - self.mu_z ** 2) + self.mu_z * np.cos(
             theta_scatter)
 
+        self.direction_cosines.append((self.mu_x, self.mu_y, self.mu_z))
         # self.thetas = np.append(self.thetas, theta_scatter)
 
     def absorb(self):
