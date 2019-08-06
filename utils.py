@@ -218,16 +218,62 @@ def plot_photon_path(photon):
 
 
 def plot_axial_paths(photons):
-    fig = make_subplots(rows=1, cols=2, subplot_titles=["X-Z Plane", "Y-Z Plane"])
+    fig = make_subplots(rows=1, cols=2, subplot_titles=["X-Z Plane", "Y-Z Plane"], shared_yaxes=True)
+    fig.update_layout(
+        showlegend=False,
+        title=go.layout.Title(
+            text="Photon paths",
+            xref="paper",
+            x=0
+        ),
 
-    for photon in photons:
+
+        yaxis=go.layout.YAxis(
+            title=go.layout.yaxis.Title(
+                text="Depth (um)",
+                font=dict(
+                    family="Courier New, monospace",
+                    size=18,
+                    color="#7f7f7f"
+                )
+            )
+        )
+    )
+    fig.update_xaxes(
+        title=go.layout.xaxis.Title(
+            text="x Axis (um)",
+            font=dict(
+                family="Courier New, monospace",
+                size=18,
+                color="#7f7f7f"
+            )
+        ),
+        row=1,
+        col=1
+
+    )
+    fig.update_xaxes(
+        title=go.layout.xaxis.Title(
+            text="y Axis (um)",
+            font=dict(
+                family="Courier New, monospace",
+                size=18,
+                color="#7f7f7f"
+            )
+        ),
+        row=1,
+        col=2
+
+    )
+
+    for i, photon in enumerate(photons):
         fig.add_trace(go.Scatter(x=photon.path[:, 0], y=photon.path[:, 2],
                                  mode='lines',
-                                 name='lines'),
+                                 name=('Photon %i' % i)),
                       row=1, col=1)
         fig.add_trace(go.Scatter(x=photon.path[:, 1], y=photon.path[:, 2],
                                  mode='lines',
-                                 name='lines'),
+                                 name=('Photon %i' % i)),
                       row=1, col=2)
 
     return fig
