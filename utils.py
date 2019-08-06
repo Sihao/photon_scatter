@@ -217,10 +217,16 @@ def plot_photon_path(photon):
     return fig
 
 
-def plot_axial_paths(photons):
+def plot_axial_paths(photons, medium, objective):
+    # Filter accepted photons
+    acceptance_list = list(map(objective.photon_accepted, photons))
+    accepted_photons = list(compress(photons, acceptance_list))
+
+    # Filter rejected photons
+    rejected_photons = list(compress(photons, [not photon for photon in acceptance_list]))
+
     fig = make_subplots(rows=1, cols=2, subplot_titles=["X-Z Plane", "Y-Z Plane"], shared_yaxes=True)
     fig.update_layout(
-        showlegend=False,
         title=go.layout.Title(
             text="Photon paths",
             xref="paper",
@@ -266,14 +272,112 @@ def plot_axial_paths(photons):
 
     )
 
-    for i, photon in enumerate(photons):
+    for i, photon in enumerate(accepted_photons):
         fig.add_trace(go.Scatter(x=photon.path[:, 0], y=photon.path[:, 2],
                                  mode='lines',
-                                 name=('Photon %i' % i)),
-                      row=1, col=1)
+                                 name=('Accepted photon %i' % i),
+                                 line=dict(
+                                     color='SeaGreen'
+                                 )
+                                 ),
+                      row=1, col=1,
+                      )
         fig.add_trace(go.Scatter(x=photon.path[:, 1], y=photon.path[:, 2],
                                  mode='lines',
-                                 name=('Photon %i' % i)),
-                      row=1, col=2)
+                                 name=('Accepted photon %i' % i),
+                                 line=dict(
+                                     color='SeaGreen'
+                                 )
+                                 ),
+                      row=1, col=2,
+                      )
+
+    for i, photon in enumerate(rejected_photons):
+        fig.add_trace(go.Scatter(x=photon.path[:, 0], y=photon.path[:, 2],
+                                 mode='lines',
+                                 name=('Rejected photon %i' % i),
+                                 line=dict(
+                                     color='Crimson'
+                                 )
+                                 ),
+                      row=1, col=1,
+                      )
+        fig.add_trace(go.Scatter(x=photon.path[:, 1], y=photon.path[:, 2],
+                                 mode='lines',
+                                 name=('Rejected photon %i' % i),
+                                 line=dict(
+                                     color='Crimson'
+                                 )
+                                 ),
+                      row=1, col=2,
+                      )
+
+    # Get minimum and maximum x values from photon paths
+    x0_0 = min([min(photon.path[:, 0]) for photon in photons])
+    x1_0 = max([max(photon.path[:, 0]) for photon in photons])
+
+    # Get minimum and maximum y values from photon paths
+    x0_1 = min([min(photon.path[:, 1]) for photon in photons])
+    x1_1 = max([max(photon.path[:, 1]) for photon in photons])
+
+    fig.update_layout(
+        shapes=[
+            # Fill sample area in XZ plot
+            go.layout.Shape(
+                type="rect",
+                x0=x0_0 + x0_0 * 0.3,
+                y0=0,
+                x1=x1_0 + x1_0 * 0.3,
+                y1=medium.shape[2],
+                line=dict(
+                    width=0,
+                ),
+                fillcolor="LightSkyBlue",
+                opacity=.2,
+            ),
+            # Fill sample area in YZ plot
+            go.layout.Shape(
+                type="rect",
+                x0=x0_1 + x0_1 * 0.3,
+                y0=0,
+                x1=x1_1 + x1_1 * 0.3,
+                xref="x2",
+                y1=medium.shape[2],
+                yref='y2',
+                line=dict(
+                    width=0,
+                ),
+                fillcolor="LightSkyBlue",
+                opacity=0.2
+            ),
+        ],
+    )
+
+    # Annotate shapes
+    fig.add_trace(
+        go.Scatter(
+            x=[x0_0 + x0_0 * 0.15],
+            y=[medium.shape[2] - medium.shape[2] * 0.15],
+            text=["Sample"],
+            mode="text",
+            textposition="bottom right",
+            showlegend=False,
+            ),
+        row=1,
+        col=1
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=[x0_1 + x0_1 * 0.15],
+            y=[medium.shape[2] - medium.shape[2] * 0.15],
+            text=["Sample"],
+            mode="text",
+            textposition="bottom right",
+            showlegend=False,
+            ),
+        row=1,
+        col=2
+    )
 
     return fig
