@@ -28,7 +28,7 @@ def multiple_sim(medium, start_pos, num_photons, omit_bottom=False, single_step=
 def single_sim(medium, start_pos, omit_bottom=False, single_step=False):
     photon = Photon(start_pos, medium)
 
-    if single_step is False:
+    if single_step is True:
         photon.propagate(omit_bottom)
     else:
         while photon.is_propagating and not photon.is_absorbed:
