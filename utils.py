@@ -19,6 +19,12 @@ def fov_sim(medium, fov, num_photons, depth, omit_bottom=False):
     return result
 
 
+def multiple_sim(medium, start_pos, num_photons, omit_bottom=False):
+    photons = [single_sim(medium, start_pos, omit_bottom) for _ in range(num_photons)]
+
+    return photons
+
+
 def single_sim(medium, start_pos, omit_bottom=False):
     photon = Photon(start_pos, medium)
 
