@@ -19,17 +19,20 @@ def fov_sim(medium, fov, num_photons, depth, omit_bottom=False):
     return result
 
 
-def multiple_sim(medium, start_pos, num_photons, omit_bottom=False):
-    photons = [single_sim(medium, start_pos, omit_bottom) for _ in range(num_photons)]
+def multiple_sim(medium, start_pos, num_photons, omit_bottom=False, single_step=False):
+    photons = [single_sim(medium, start_pos, omit_bottom, single_step) for _ in range(num_photons)]
 
     return photons
 
 
-def single_sim(medium, start_pos, omit_bottom=False):
+def single_sim(medium, start_pos, omit_bottom=False, single_step=False):
     photon = Photon(start_pos, medium)
 
-    while photon.is_propagating and not photon.is_absorbed:
+    if single_step is False:
         photon.propagate(omit_bottom)
+    else:
+        while photon.is_propagating and not photon.is_absorbed:
+            photon.propagate(omit_bottom)
     # print('Path length: %f' %photon.total_path)
 
     if photon.is_omitted or photon.is_absorbed:
