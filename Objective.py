@@ -17,7 +17,7 @@ class Objective:
         aperture_z = np.cos(self.theta) * self.working_distance + self.sample_thickness
 
         # Only consider photons that didn't exit the bottom
-        if photon.current_pos[2] > 0:
+        if photon.mu_z > 0:
             # Compute (X, Y) position of photon at height of aperture opening
             photon_x = ((aperture_z - photon.current_pos[2]) / photon.mu_z) * photon.mu_x + photon.current_pos[0]
             photon_y = ((aperture_z - photon.current_pos[2]) / photon.mu_z) * photon.mu_y + photon.current_pos[1]
