@@ -63,7 +63,7 @@ def calc_acceptance_matrix(fov_photon_matrix, objective):
     return acceptance_matrix
 
 
-def plot_photons(photons, objective, show_aperture=False):
+def plot_photons(photons, objective, show_aperture=False, cones=False):
     # Filter accepted photons
     acceptance_list = list(map(objective.photon_accepted, photons))
     accepted_photons = list(compress(photons, acceptance_list))
@@ -77,44 +77,71 @@ def plot_photons(photons, objective, show_aperture=False):
     # Get coordinates of rejected photons
     rejected_positions = np.array([photon.path[-1] for photon in rejected_photons])
 
-    # Define constant colorscale
-    pl_red = [[0, '#bd1540'],
-              [1, '#bd1540']]
+    if cones is False:
+        try:
+            fig = go.Figure(
+                data=[go.Scatter3d(x=accepted_positions[:, 0], y=accepted_positions[:, 1], z=accepted_positions[:, 2],
+                                   mode='markers', marker=dict(
+                        size=3,
+                        opacity=0.8,
+                        color='green'
+                    ))])
+            fig.add_trace(
+                go.Scatter3d(x=rejected_positions[:, 0], y=rejected_positions[:, 1], z=rejected_positions[:, 2],
+                             mode='markers', marker=dict(
+                        size=3,
+                        opacity=0.2,
+                        color='red'
+                    )))
+        except IndexError:
+            fig = go.Figure(
+                data=[go.Scatter3d(x=rejected_positions[:, 0], y=rejected_positions[:, 1], z=rejected_positions[:, 2],
+                                   mode='markers', marker=dict(
+                        size=3,
+                        opacity=0.2,
+                        color='red'
+                    ))]
+            )
 
-    pl_green = [[0, '#009900'],
-               [1, '#009900']]
-    try:
-        fig = go.Figure(
-            data=[go.Cone(x=accepted_positions[:, 0], y=accepted_positions[:, 1], z=accepted_positions[:, 2],
-                              u=[photon.mu_x for photon in accepted_photons],
-                              v=[photon.mu_y for photon in accepted_photons],
-                              w=[photon.mu_z for photon in accepted_photons],
-                              anchor="tail",
-                              colorscale=pl_green,
-                              hoverinfo="all",
-                              showscale=False,
-                              sizeref=3)]
-        )
-        fig.add_trace(go.Cone(x=rejected_positions[:, 0], y=rejected_positions[:, 1], z=rejected_positions[:, 2],
-                              u=[photon.mu_x for photon in rejected_photons],
-                              v=[photon.mu_y for photon in rejected_photons],
-                              w=[photon.mu_z for photon in rejected_photons],
-                              anchor="tail",
-                              colorscale=pl_red,
-                              hoverinfo="all",
-                              showscale=False,
-                              sizeref=3)
-        )
+    else:
+        # Define constant colorscale
+        pl_red = [[0, '#bd1540'],
+                  [1, '#bd1540']]
 
-    except IndexError:
-        fig = go.Figure(
-            data=[go.Scatter3d(x=rejected_positions[:, 0], y=rejected_positions[:, 1], z=rejected_positions[:, 2],
-                               mode='markers', marker=dict(
-                    size=3,
-                    opacity=0.2,
-                    color='red'
-                ))]
-        )
+        pl_green = [[0, '#009900'],
+                   [1, '#009900']]
+        try:
+            fig = go.Figure(
+                data=[go.Cone(x=accepted_positions[:, 0], y=accepted_positions[:, 1], z=accepted_positions[:, 2],
+                                  u=[photon.mu_x for photon in accepted_photons],
+                                  v=[photon.mu_y for photon in accepted_photons],
+                                  w=[photon.mu_z for photon in accepted_photons],
+                                  anchor="tail",
+                                  colorscale=pl_green,
+                                  hoverinfo="all",
+                                  showscale=False,
+                                  sizeref=3)]
+            )
+            fig.add_trace(go.Cone(x=rejected_positions[:, 0], y=rejected_positions[:, 1], z=rejected_positions[:, 2],
+                                  u=[photon.mu_x for photon in rejected_photons],
+                                  v=[photon.mu_y for photon in rejected_photons],
+                                  w=[photon.mu_z for photon in rejected_photons],
+                                  anchor="tail",
+                                  colorscale=pl_red,
+                                  hoverinfo="all",
+                                  showscale=False,
+                                  sizeref=3)
+            )
+
+        except IndexError:
+            fig = go.Figure(
+                data=[go.Scatter3d(x=rejected_positions[:, 0], y=rejected_positions[:, 1], z=rejected_positions[:, 2],
+                                   mode='markers', marker=dict(
+                        size=3,
+                        opacity=0.2,
+                        color='red'
+                    ))]
+            )
 
     if show_aperture:
         # Show objective aperture
@@ -137,6 +164,19 @@ def plot_photons(photons, objective, show_aperture=False):
             z=aperture_z,
             showscale=False)
         )
+
+    fig.update_layout(
+        title=go.layout.Title(
+            text="Photon positions",
+            xref="paper",
+            x=0
+        ),
+        scene=dict(
+            xaxis_title="x (um)",
+            yaxis_title="y (um)",
+            zaxis_title="z (um)",
+        )
+    )
 
     return fig
 
