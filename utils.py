@@ -433,11 +433,11 @@ def plot_axial_paths(photons, medium, objective):
     return fig
 
 
-def animate_photon_positions(photons):
-    def get_photon_coordinates(axis, step):
+def animate_photon_positions(photons, objective):
+    def get_photon_coordinates(input_photons, axis, step):
         coordinates = []
 
-        for i, photon in enumerate(photons):
+        for i, photon in enumerate(input_photons):
             try:
                 coordinates.append(photon.path[step][axis])
             except IndexError:
@@ -447,17 +447,36 @@ def animate_photon_positions(photons):
 
     max_steps = max([len(photon.path) for photon in photons])
 
+    # Filter accepted photons
+    acceptance_list = list(map(objective.photon_accepted, photons))
+    accepted_photons = list(compress(photons, acceptance_list))
+
+    # Filter rejected photons
+    rejected_photons = list(compress(photons, [not photon for photon in acceptance_list]))
+
     fig = go.Figure(
         data=[
             go.Scatter3d(
-                x=get_photon_coordinates(0, 0),
-                y=get_photon_coordinates(1, 0),
-                z=get_photon_coordinates(2, 0),
+                x=get_photon_coordinates(accepted_photons, 0, 0),
+                y=get_photon_coordinates(accepted_photons, 1, 0),
+                z=get_photon_coordinates(accepted_photons, 2, 0),
                 mode='markers',
                 marker=dict(
                     size=3,
+                    color="green"
                 )
-            )
+            ),
+            go.Scatter3d(
+                x=get_photon_coordinates(rejected_photons, 0, 0),
+                y=get_photon_coordinates(rejected_photons, 1, 0),
+                z=get_photon_coordinates(rejected_photons, 2, 0),
+                mode='markers',
+                marker=dict(
+                    size=3,
+                    color="red"
+                )
+            ),
+
         ],
         layout=go.Layout(
             scene=dict(
@@ -510,13 +529,26 @@ def animate_photon_positions(photons):
         frames=[
 
                 go.Frame(
-                  data=[
+                    data=[
                         go.Scatter3d(
-                           x=get_photon_coordinates(0, i),
-                           y=get_photon_coordinates(1, i),
-                           z=get_photon_coordinates(2, i),
+                            x=get_photon_coordinates(accepted_photons, 0, i),
+                            y=get_photon_coordinates(accepted_photons, 1, i),
+                            z=get_photon_coordinates(accepted_photons, 2, i),
+                            marker=dict(
+                                color="green"
+                            ),
+                            name="Accepted"
+                        ),
+                        go.Scatter3d(
+                            x=get_photon_coordinates(rejected_photons, 0, i),
+                            y=get_photon_coordinates(rejected_photons, 1, i),
+                            z=get_photon_coordinates(rejected_photons, 2, i),
+                            marker=dict(
+                                color="red"
+                            ),
+                            name="Rejected"
                         )
-                   ]
+                    ]
                 )
                 for i in range(max_steps)
         ]
