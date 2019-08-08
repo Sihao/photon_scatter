@@ -431,3 +431,92 @@ def plot_axial_paths(photons, medium, objective):
     )
 
     return fig
+
+
+def animate_photon_positions(photons):
+    def get_photon_coordinates(axis, step):
+        coordinates = []
+
+        for i, photon in enumerate(photons):
+            try:
+                coordinates.append(photon.path[step][axis])
+            except IndexError:
+                coordinates.append(photon.path[-1][axis])
+
+        return coordinates
+
+    max_steps = max([len(photon.path) for photon in photons])
+
+    fig = go.Figure(
+        data=[
+            go.Scatter3d(
+                x=get_photon_coordinates(0, 0),
+                y=get_photon_coordinates(1, 0),
+                z=get_photon_coordinates(2, 0),
+                mode='markers',
+                marker=dict(
+                    size=3,
+                )
+            )
+        ],
+        layout=go.Layout(
+            scene=dict(
+
+                xaxis=dict(range=[-3000, 3000], autorange=False),
+                yaxis=dict(range=[-3000, 3000], autorange=False),
+                zaxis=dict(range=[-500, 2500], autorange=False),
+                aspectratio=dict(x=1, y=1, z=0.5)
+            ),
+            title="Photon propagation animation",
+            updatemenus=[dict(
+                type="buttons",
+                buttons=[
+                    dict(
+                        label="Play",
+                        method="animate",
+                        args=[
+                            None,
+                            dict(
+                                frame=dict(
+                                    duration=50,
+                                    redraw=True
+                                ),
+                                fromcurrent=True,
+                                mode="immediate"
+
+                            )
+                        ]
+                    ),
+                    dict(
+                     args=[
+                         None,
+                         dict(
+                             frame=dict(
+                                 duration=0,
+                                 redraw=False
+                             ),
+                             mode="immediate",
+                         )
+
+                     ],
+                     label="Stop",
+                     method="animate"
+                    )
+                ])]
+        ),
+        frames=[
+
+                go.Frame(
+                  data=[
+                        go.Scatter3d(
+                           x=get_photon_coordinates(0, i),
+                           y=get_photon_coordinates(1, i),
+                           z=get_photon_coordinates(2, i),
+                        )
+                   ]
+                )
+                for i in range(max_steps)
+        ]
+    )
+
+    return fig
