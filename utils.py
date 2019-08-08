@@ -465,6 +465,9 @@ def animate_photon_positions(photons):
                 xaxis=dict(range=[-3000, 3000], autorange=False),
                 yaxis=dict(range=[-3000, 3000], autorange=False),
                 zaxis=dict(range=[-500, 2500], autorange=False),
+                xaxis_title="x (um)",
+                yaxis_title="y (um)",
+                zaxis_title="z (um)",
                 aspectratio=dict(x=1, y=1, z=0.5)
             ),
             title="Photon propagation animation",
@@ -489,7 +492,7 @@ def animate_photon_positions(photons):
                     ),
                     dict(
                      args=[
-                         None,
+                         [None],
                          dict(
                              frame=dict(
                                  duration=0,
