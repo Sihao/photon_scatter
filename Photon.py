@@ -209,7 +209,7 @@ class Photon:
             self.roulette()
 
     def roulette(self):
-        if rand() < 1 / self.m:
+        if rand() < (1 / self.m):
             self.W = self.m * self.W
         else:
             self.W = 0
