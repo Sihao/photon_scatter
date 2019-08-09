@@ -6,6 +6,13 @@ class Objective:
     Class defining properties and methods for Objective object
     """
     def __init__(self, numerical_aperture, working_distance, sample_thickness, refractive_index=1):
+        """
+        :param numerical_aperture: Numerical aperture of the objective
+        :param working_distance: Working distance of the objective
+        :param sample_thickness: Thickness of the sample being imaged in microns.
+        :param refractive_index: Refractive index of the medium that the objective is in. Default `refractive_index=`1
+               for air
+        """
         self.n = refractive_index
         self.NA = numerical_aperture
         self.working_distance = working_distance
