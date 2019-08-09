@@ -182,13 +182,18 @@ class Photon:
         self.mu_z = - np.sin(theta_scatter) * np.cos(phi) * np.sqrt(1 - self.mu_z ** 2) + self.mu_z * np.cos(
             theta_scatter)
 
-        def normalize(v):
+        def normalise(v):
+            """
+            Normalises input vector `v` to have unit length (L2-normalisation)
+            :param v: Vector to be normalised, input should be array-like [x, y, z]
+            :return: L2-normalised vector
+            """
             norm = np.linalg.norm(v, ord=2)
             if norm == 0:
                 norm = np.finfo(v.dtype).eps
             return v / norm
 
-        [self.mu_x, self.mu_y, self.mu_z] = normalize([self.mu_x, self.mu_y, self.mu_z])
+        [self.mu_x, self.mu_y, self.mu_z] = normalise([self.mu_x, self.mu_y, self.mu_z])
 
         self.direction_cosines.append((self.mu_x, self.mu_y, self.mu_z))
         # self.thetas = np.append(self.thetas, theta_scatter)
