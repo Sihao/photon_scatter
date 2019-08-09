@@ -510,6 +510,12 @@ def plot_axial_paths(photons, medium, objective):
 
 
 def animate_photon_positions(photons, objective):
+    """
+    Create animation of photons propagating in 3-D. Colour coded for accepted photons (green) and rejected photons (red)
+    :param photons: List of Photon objects.
+    :param objective: Objective object.
+    :return: Plotly Figure object.
+    """
     def get_photon_coordinates(input_photons, axis, step):
         coordinates = []
 
