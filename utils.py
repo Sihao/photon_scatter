@@ -199,15 +199,26 @@ def plot_photons(photons, objective, show_aperture=False, cones=False):
 
 
 def plot_fov_heatmap(acceptance_matrix, fov):
-    fig = go.Figure(data=go.Heatmap(
-        x=fov,
-        y=fov,
-        z=acceptance_matrix,)
+    fig = go.Figure(
+        data=go.Heatmap(
+            x=fov,
+            y=fov,
+            z=acceptance_matrix,
+        )
     )
 
-    fig.update_layout(yaxis=dict(
-        scaleanchor="x",
-        scaleratio=1,)
+    fig.update_layout(
+        autosize=False,
+        width=800,
+        height=800,
+        yaxis=dict(
+            scaleanchor="x",
+            scaleratio=1,
+            title="y (um)"
+        ),
+        xaxis=dict(
+            title="x (um)"
+        )
     )
 
     return fig
