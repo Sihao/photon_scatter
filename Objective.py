@@ -2,6 +2,9 @@ import numpy as np
 
 
 class Objective:
+    """
+    Class defining properties and methods for Objective object
+    """
     def __init__(self, numerical_aperture, working_distance, sample_thickness, refractive_index=1):
         self.n = refractive_index
         self.NA = numerical_aperture
@@ -13,6 +16,11 @@ class Objective:
         self.theta = np.arcsin(self.NA / self.n)
 
     def photon_accepted(self, photon):
+        """
+        Determine whether a photon is absorbed based on its position, direction and the properties of the objective
+        :param photon: Photon object
+        :return: `True` if the photon is accepted and `False` if it is not accepted.
+        """
         # Determine Z-position of aperture opening
         aperture_z = np.cos(self.theta) * self.working_distance + self.sample_thickness
 
