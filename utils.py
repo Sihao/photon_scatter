@@ -20,6 +20,15 @@ def fov_sim(medium, fov, num_photons, depth, omit_bottom=False):
 
 
 def multiple_sim(medium, start_pos, num_photons, omit_bottom=False, single_step=False):
+    """
+    Simulate multiple photons propagating through a medium
+    :param medium: Medium object
+    :param start_pos: Position the photon is starting from. Must be within the Medium as defined in Medium.shape
+    :param num_photons: Number of photons to simulate
+    :param omit_bottom: Flag to omit all photons exiting from the bottom of the medium. Default is `False`.
+    :param single_step: Flag to only propagate photon for one step. Default is `False`.
+    :return: List of Photon objects. Omitted and absorbed photons are filtered out.
+    """
     photons = [single_sim(medium, start_pos, omit_bottom, single_step) for _ in range(num_photons)]
     photons = list(filter(None, photons))
 
@@ -27,6 +36,14 @@ def multiple_sim(medium, start_pos, num_photons, omit_bottom=False, single_step=
 
 
 def single_sim(medium, start_pos, omit_bottom=False, single_step=False):
+    """
+    Simulate a single photon propagating through a medium
+    :param medium: Medium object
+    :param start_pos: Position the photon is starting from. Must be within the Medium as defined in Medium.shape
+    :param omit_bottom: Flag to omit all photons exiting from the bottom of the medium. Default is `False`.
+    :param single_step: Flag to only propagate photon for one step. Default is `False`.
+    :return: Photon object or `None` if photon is omitted or absorbed
+    """
     photon = Photon(start_pos, medium)
 
     if single_step is True:
