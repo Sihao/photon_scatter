@@ -103,6 +103,14 @@ def calc_acceptance_matrix(fov_photon_matrix, objective):
 
 
 def plot_photons(photons, objective, show_aperture=False, cones=False):
+    """
+    Plot positions of photons in 3-D. Colours accepted photons in green and rejected photons in red.
+    :param photons: List of Photon objects
+    :param objective: Objective object
+    :param show_aperture: Flag to plot circle representing front aperture of objective. Default is `False`.
+    :param cones: Flag to plot photons as dots or cones (indicating propagation direction). Default is `False`.
+    :return: Plotly Figure object.
+    """
     # Filter accepted photons
     acceptance_list = list(map(objective.photon_accepted, photons))
     accepted_photons = list(compress(photons, acceptance_list))
@@ -221,6 +229,12 @@ def plot_photons(photons, objective, show_aperture=False, cones=False):
 
 
 def plot_fov_heatmap(acceptance_matrix, fov):
+    """
+    Plot heatmap of acceptance ratio across a field of view.
+    :param acceptance_matrix: Numpy array where each element holds acceptance ratio at a given position
+    :param fov: List of 1-D coordinates. Used for axis range of heatmap.
+    :return: Plotly Figure object.
+    """
     fig = go.Figure(
         data=go.Heatmap(
             x=fov,
@@ -247,6 +261,11 @@ def plot_fov_heatmap(acceptance_matrix, fov):
 
 
 def plot_photon_path(photon):
+    """
+    Plot propagation path of a single photon in 3-D.
+    :param photon: Photon object
+    :return: Plotly Figure object.
+    """
     # fig = go.Figure(
     #     data=[go.Scatter3d(
     #         x=photon.path[:, 0],
@@ -318,6 +337,13 @@ def plot_photon_path(photon):
 
 
 def plot_axial_paths(photons, medium, objective):
+    """
+    Plot the path of photons in 2-D (both in the X-Z and Y-Z plane)
+    :param photons: List of Photon objects.
+    :param medium: Medium object.
+    :param objective: Objective object.
+    :return: PLotly Figure object.
+    """
     # Filter accepted photons
     acceptance_list = list(map(objective.photon_accepted, photons))
     accepted_photons = list(compress(photons, acceptance_list))
