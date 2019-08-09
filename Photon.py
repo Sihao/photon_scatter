@@ -209,6 +209,10 @@ class Photon:
             self.roulette()
 
     def roulette(self):
+        """
+        Randomly decided whether photon will be absorbed or not based on `m` property.
+        Changes photon weight `W` and sets `is_absorbed` property to True if photon is absorbed.
+        """
         if rand() < (1 / self.m):
             self.W = self.m * self.W
         else:
