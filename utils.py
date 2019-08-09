@@ -7,6 +7,16 @@ from Photon import Photon
 
 
 def fov_sim(medium, fov, num_photons, depth, omit_bottom=False):
+    """
+    Simulate photon propagation over a grid of start positions. Only supports square grids.
+    :param medium: Medium object
+    :param fov: List of 1-D coordinates which will be made into square 2-D grid.
+    :param num_photons: Number of photons to simulate per position in the grid
+    :param depth: Flag to omit all photons exiting from the bottom of the medium. Default is `False`.
+    :param omit_bottom: Flag to only propagate photon for one step. Default is `False`.
+    :return: Nested list of Photon objects. Main list contains lists of photons with start positions on the same row.
+             Sublist contains lists of Photon objects per position in row.
+    """
     result = []
     for i in fov:
         result_j = []
@@ -60,6 +70,12 @@ def single_sim(medium, start_pos, omit_bottom=False, single_step=False):
 
 
 def calc_acceptance_ratio(photons, objective):
+    """
+    Calculate ratio of photons accepted into the objective
+    :param photons: List of Photon objects.
+    :param objective: Objective object
+    :return: Scalar value
+    """
     # Filter accepted photons
     acceptance_list = list(map(objective.photon_accepted, photons))
     accepted_photons = list(compress(photons, acceptance_list))
@@ -71,6 +87,12 @@ def calc_acceptance_ratio(photons, objective):
 
 
 def calc_acceptance_matrix(fov_photon_matrix, objective):
+    """
+    Calculate ratio of photons accepted into the objective on a grid
+    :param fov_photon_matrix: Output of fov_sim()
+    :param objective: Objective object
+    :return: Numpy array where each element holds acceptance ratio at a given position
+    """
     acceptance_matrix = np.reshape(
         np.array(
             [calc_acceptance_ratio(fov_spot, objective) for fov_row in fov_photon_matrix for fov_spot in
