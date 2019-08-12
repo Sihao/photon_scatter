@@ -127,27 +127,51 @@ def plot_photons(photons, objective, show_aperture=False, cones=False):
     if cones is False:
         try:
             fig = go.Figure(
-                data=[go.Scatter3d(x=accepted_positions[:, 0], y=accepted_positions[:, 1], z=accepted_positions[:, 2],
-                                   mode='markers', marker=dict(
-                        size=3,
-                        opacity=0.8,
-                        color='green'
-                    ))])
+                data=[
+                    go.Scatter3d(
+                        x=accepted_positions[:, 0],
+                        y=accepted_positions[:, 1],
+                        z=accepted_positions[:, 2],
+                        mode='markers',
+                        marker=dict(
+                            size=3,
+                            opacity=0.8,
+                            color='green',
+                        ),
+                        name='Accepted photons',
+                    )
+                ]
+            )
             fig.add_trace(
-                go.Scatter3d(x=rejected_positions[:, 0], y=rejected_positions[:, 1], z=rejected_positions[:, 2],
-                             mode='markers', marker=dict(
+                go.Scatter3d(
+                    x=rejected_positions[:, 0],
+                    y=rejected_positions[:, 1],
+                    z=rejected_positions[:, 2],
+                    mode='markers',
+                    marker=dict(
                         size=3,
                         opacity=0.2,
-                        color='red'
-                    )))
+                        color='red',
+                    ),
+                    name='Rejected photons',
+                )
+            )
         except IndexError:
             fig = go.Figure(
-                data=[go.Scatter3d(x=rejected_positions[:, 0], y=rejected_positions[:, 1], z=rejected_positions[:, 2],
-                                   mode='markers', marker=dict(
-                        size=3,
-                        opacity=0.2,
-                        color='red'
-                    ))]
+                data=[
+                    go.Scatter3d(
+                        x=rejected_positions[:, 0],
+                        y=rejected_positions[:, 1],
+                        z=rejected_positions[:, 2],
+                        mode='markers',
+                        marker=dict(
+                            size=3,
+                            opacity=0.2,
+                            color='red',
+                        ),
+                        name='Rejected photons',
+                    )
+                ]
             )
 
     else:
@@ -164,6 +188,7 @@ def plot_photons(photons, objective, show_aperture=False, cones=False):
                                   v=[photon.mu_y for photon in accepted_photons],
                                   w=[photon.mu_z for photon in accepted_photons],
                                   anchor="tail",
+                                  name='Accepted photons',
                                   colorscale=pl_green,
                                   hoverinfo="all",
                                   showscale=False,
@@ -174,6 +199,7 @@ def plot_photons(photons, objective, show_aperture=False, cones=False):
                                   v=[photon.mu_y for photon in rejected_photons],
                                   w=[photon.mu_z for photon in rejected_photons],
                                   anchor="tail",
+                                  name='Rejected photons',
                                   colorscale=pl_red,
                                   hoverinfo="all",
                                   showscale=False,
@@ -182,12 +208,20 @@ def plot_photons(photons, objective, show_aperture=False, cones=False):
 
         except IndexError:
             fig = go.Figure(
-                data=[go.Scatter3d(x=rejected_positions[:, 0], y=rejected_positions[:, 1], z=rejected_positions[:, 2],
-                                   mode='markers', marker=dict(
-                        size=3,
-                        opacity=0.2,
-                        color='red'
-                    ))]
+                data=[
+                    go.Scatter3d(
+                        x=rejected_positions[:, 0],
+                        y=rejected_positions[:, 1],
+                        z=rejected_positions[:, 2],
+                        mode='markers',
+                        marker=dict(
+                            size=3,
+                            opacity=0.2,
+                            color='red',
+                        ),
+                        name='Rejected photons',
+                    )
+                ]
             )
 
     if show_aperture:
