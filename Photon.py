@@ -128,12 +128,13 @@ class Photon:
 
         theta_i = np.arccos(self.mu_z)
 
-        # Calculate critical angle
-        theta_crit = np.arcsin(self.medium.N_e / self.medium.N_i)
+        if self.medium.N_e / self.medium.N_i < 1:
+            # Calculate critical angle
+            theta_crit = np.arcsin(self.medium.N_e / self.medium.N_i)
 
-        # All angles greater than critical angle will be reflected
-        if theta_crit < theta_i < np.pi / 2 or theta_crit < np.pi - theta_i < np.pi / 2:
-            self.P_r = 1
+            # All angles greater than critical angle will be reflected
+            if theta_crit < theta_i < np.pi / 2 or theta_crit < np.pi - theta_i < np.pi / 2:
+                self.P_r = 1
 
         else:
             # Calculate external angle based on Snell's Law
