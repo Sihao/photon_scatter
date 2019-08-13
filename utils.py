@@ -528,6 +528,25 @@ def plot_axial_paths(photons, medium, objective):
                 fillcolor="LightSkyBlue",
                 opacity=0.2
             ),
+
+        ],
+        annotations=[
+            go.layout.Annotation(
+                yref="paper",
+                xref='paper',
+                y=0,
+                x=0,
+                text=("Acceptance rate: %.2f%%" % (calc_acceptance_ratio(photons, objective) * 100)),
+                showarrow=False
+            ),
+            go.layout.Annotation(
+                yref="paper",
+                xref='paper',
+                y=0.1,
+                x=0,
+                text=("Photons exited: %d" % len(photons)),
+                showarrow=False
+            )
         ],
     )
 
