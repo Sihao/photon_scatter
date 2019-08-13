@@ -252,6 +252,24 @@ def plot_photons(photons, objective, show_aperture=False, cones=False):
             xref="paper",
             x=0
         ),
+        annotations=[
+            go.layout.Annotation(
+                yref="paper",
+                xref='paper',
+                y=0,
+                x=0,
+                text=("Acceptance rate: %.2f%%" % (calc_acceptance_ratio(photons, objective) * 100)),
+                showarrow=False
+            ),
+            go.layout.Annotation(
+                yref="paper",
+                xref='paper',
+                y=0.1,
+                x=0,
+                text=("Photons exited: %d" % len(photons)),
+                showarrow=False
+            )
+        ],
         scene=dict(
             xaxis_title="x (um)",
             yaxis_title="y (um)",
