@@ -126,17 +126,7 @@ class Photon:
         :return: True if photon is reflected, False otherwise.
         """
 
-        theta_i = np.arccos(self.mu_z)
-
-        if self.medium.N_e / self.medium.N_i < 1:
-            # Calculate critical angle
-            theta_crit = np.arcsin(self.medium.N_e / self.medium.N_i)
-
-            # All angles greater than critical angle will be reflected
-            if theta_crit < theta_i < np.pi / 2 or theta_crit < np.pi - theta_i < np.pi / 2:
-                self.P_r = 1
-
-        else:
+        def calc_reflection_coefficient():
             # Calculate external angle based on Snell's Law
             theta_e = np.arcsin((self.medium.N_i / self.medium.N_e) * np.sin(theta_i))
 
@@ -151,7 +141,23 @@ class Photon:
             r_perp = (self.medium.N_i * np.cos(theta_e) - self.medium.N_e * np.cos(theta_i)) / (
                     self.medium.N_i * np.cos(theta_e) + self.medium.N_e * np.cos(theta_i))
 
-            self.P_r = (r_par ** 2 + r_perp ** 2) / 2
+            P_r = (r_par ** 2 + r_perp ** 2) / 2
+
+            return P_r
+
+        theta_i = np.arccos(self.mu_z)
+
+        if self.medium.N_e / self.medium.N_i < 1:
+            # Calculate critical angle
+            theta_crit = np.arcsin(self.medium.N_e / self.medium.N_i)
+
+            # All angles greater than critical angle will be reflected
+            if theta_crit < theta_i < np.pi / 2 or theta_crit < np.pi - theta_i < np.pi / 2:
+                self.P_r = 1
+            else:
+                self.P_r = calc_reflection_coefficient()
+        else:
+            self.P_r = calc_reflection_coefficient()
 
         if rand() < self.P_r:
             return True
