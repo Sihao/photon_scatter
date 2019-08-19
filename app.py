@@ -114,7 +114,7 @@ app.layout = html.Div(children=[
                                 placeholder="Focus depth",
                                 type="number",
                                 id="focus_depth",
-                                value=890,
+                                value=10,
                                 step=10,
                                 min=0
                             ),
@@ -229,6 +229,8 @@ app.layout = html.Div(children=[
 def button_sim_photons(n_clicks, num_photons, mu_s, mu_a, n_i, n_e, g, sample_thickness, focus_depth, x_cor, y_cor):
     if n_clicks is None:
         raise dash.exceptions.PreventUpdate
+
+    focus_depth = sample_thickness - focus_depth
 
     start_pos = np.array([x_cor, y_cor, focus_depth])
     medium_shape = np.array([float('inf'), float('inf'), sample_thickness])
