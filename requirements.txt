@@ -9,6 +9,7 @@ cryptography==2.7
 cycler==0.10.0
 cytoolz==0.10.0
 dash==1.1.1
+dash-bootstrap-components==0.7.0
 dash-core-components==1.1.1
 dash-html-components==1.0.0
 dash-renderer==1.0.0
@@ -18,11 +19,13 @@ distributed==2.2.0
 Flask==1.1.1
 Flask-Compress==1.4.0
 fsspec==0.4.0
+gunicorn==19.9.0
 heapdict==1.0.0
 idna==2.8
 ipython-genutils==0.2.0
 itsdangerous==1.1.0
 Jinja2==2.10.1
+jsonpickle==1.2
 jsonschema==3.0.1
 jupyter-core==4.5.0
 kiwisolver==1.1.0
