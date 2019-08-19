@@ -292,7 +292,9 @@ def plot_fov_heatmap(acceptance_matrix, fov):
             x=fov,
             y=fov,
             z=acceptance_matrix,
-        )
+            zmin=0,
+            zmax=1
+        ),
     )
 
     fig.update_layout(
@@ -534,16 +536,16 @@ def plot_axial_paths(photons, medium, objective):
             go.layout.Annotation(
                 yref="paper",
                 xref='paper',
-                y=0,
-                x=0,
+                y=1.05,
+                x=1,
                 text=("Acceptance rate: %.2f%%" % (calc_acceptance_ratio(photons, objective) * 100)),
                 showarrow=False
             ),
             go.layout.Annotation(
                 yref="paper",
                 xref='paper',
-                y=0.1,
-                x=0,
+                y=1.05,
+                x=0.5,
                 text=("Photons exited: %d" % len(photons)),
                 showarrow=False
             )
