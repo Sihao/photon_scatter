@@ -102,6 +102,32 @@ def calc_acceptance_matrix(fov_photon_matrix, objective):
     return acceptance_matrix
 
 
+def plot_exit_angle_distribution(photons):
+    """
+    Plots the cumulative distribution of \theta of the list of input Photons
+    :param photons: List of Photon objects
+    :return: Plotly Figure object
+    """
+    theta_list = [np.arccos(photon.mu_z) for photon in photons]
+    fig = go.Figure(
+        data=[
+            go.Histogram(
+                x=theta_list,
+                histnorm='probability',
+                cumulative_enabled=True,
+            )
+        ]
+    )
+
+    fig.update_layout(
+        xaxis_title_text='Degrees (rad)',
+        yaxis_title_text='Probability',
+        title_text="$ \\text{Cumulative probability distribution of } \\theta$"
+    )
+
+    return fig
+
+
 def plot_photons(photons, objective, show_aperture=False, cones=False):
     """
     Plot positions of photons in 3-D. Colours accepted photons in green and rejected photons in red.
@@ -292,8 +318,8 @@ def plot_fov_heatmap(acceptance_matrix, fov):
             x=fov,
             y=fov,
             z=acceptance_matrix,
-            zmin=0,
-            zmax=1
+            # zmin=0,
+            # zmax=1
         ),
     )
 
