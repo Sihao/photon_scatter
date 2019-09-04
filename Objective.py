@@ -5,6 +5,7 @@ class Objective:
     """
     Class defining properties and methods for Objective object
     """
+
     def __init__(self, numerical_aperture, working_distance, sample_thickness, refractive_index=1):
         """
         :param numerical_aperture: Numerical aperture of the objective
@@ -45,3 +46,38 @@ class Objective:
                 return False
         else:
             return False
+
+
+    def theoretical_collection_efficiency(self, deviation, type='sphere'):
+        """
+        Calcute the theoretical photon collection efficiency based on the distance of the excitation from the optical
+        axis. Based on the ratio of the fraction of light emitted reaching the objective. Modeled as a fraction of the
+        surface area of a sphere.
+        :param deviation: Distance from the optical axis in microns.
+        :param type: Either `sphere` or `hemisphere`. `hemisphere` doubles the collection efficiency based on the
+        assumption that only one hemispehre is viable for collection.
+        :return: Collection efficiency.
+        """
+        # Rename parameters
+        h = self.working_distance
+        d = deviation
+        r = h * np.tan(self.theta)
+
+        # Calculate properties of oblique cone
+        n = np.sqrt(h ** 2 + (d + r) ** 2)
+        m = np.sqrt(h ** 2 + (d - r) ** 2)
+        l = np.sqrt(h ** 2 + d ** 2)
+
+        beta = ((d - r) ** 2 + m ** 2 - h ** 2) / (2 * (d - r) * m)
+        gamma = ((d + r) ** 2 + n ** 2 - h ** 2) / (2 * (d + r) * n)
+
+        if d + r is 0:
+            beta = np.pi / 2
+
+        # Calculate collection angle
+        theta_emission = (beta - gamma) / 2
+
+        # Calculate efficiency
+        efficiency = 0.5 * (1 - np.cos(theta_emission))
+
+        return efficiency
