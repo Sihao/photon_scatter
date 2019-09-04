@@ -80,4 +80,9 @@ class Objective:
         # Calculate efficiency
         efficiency = 0.5 * (1 - np.cos(theta_emission))
 
-        return efficiency
+        if type is 'sphere':
+            return efficiency
+        elif 'hemisphere':
+            return 2 * efficiency
+        else:
+            return TypeError('Please choose `sphere` or `hemisphere`.')
