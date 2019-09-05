@@ -47,7 +47,6 @@ class Objective:
         else:
             return False
 
-
     def theoretical_collection_efficiency(self, deviation, type='sphere'):
         """
         Calcute the theoretical photon collection efficiency based on the distance of the excitation from the optical
