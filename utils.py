@@ -6,7 +6,7 @@ from plotly.subplots import make_subplots
 from Photon import Photon
 
 
-def fov_sim(medium, fov, num_photons, depth, omit_bottom=False, bottom_reflection=True):
+def fov_sim(medium, fov, num_photons, depth, omit_bottom=False):
     """
     Simulate photon propagation over a grid of start positions. Only supports square grids.
     :param medium: Medium object
@@ -14,7 +14,6 @@ def fov_sim(medium, fov, num_photons, depth, omit_bottom=False, bottom_reflectio
     :param num_photons: Number of photons to simulate per position in the grid
     :param depth: Flag to omit all photons exiting from the bottom of the medium. Default is `False`.
     :param omit_bottom: Flag to only propagate photon for one step. Default is `False`.
-    :param bottom_reflection: Flag to set whether photons are able to reflect from the bottom of the medium.
     :return: Nested list of Photon objects. Main list contains lists of photons with start positions on the same row.
              Sublist contains lists of Photon objects per position in row.
     """
@@ -22,7 +21,7 @@ def fov_sim(medium, fov, num_photons, depth, omit_bottom=False, bottom_reflectio
     for i in fov:
         result_j = []
         for j in fov:
-            fov_row = [single_sim(medium, np.array([i, j, depth]), omit_bottom, bottom_reflection) for _ in range(num_photons)]
+            fov_row = [single_sim(medium, np.array([i, j, depth]), omit_bottom) for _ in range(num_photons)]
             fov_row = list(filter(None, fov_row))
             result_j.append(fov_row)
         result.append(result_j)
@@ -30,7 +29,7 @@ def fov_sim(medium, fov, num_photons, depth, omit_bottom=False, bottom_reflectio
     return result
 
 
-def multiple_sim(medium, start_pos, num_photons, omit_bottom=False, single_step=False, bottom_reflection=True):
+def multiple_sim(medium, start_pos, num_photons, omit_bottom=False, single_step=False):
     """
     Simulate multiple photons propagating through a medium
     :param medium: Medium object
@@ -38,37 +37,24 @@ def multiple_sim(medium, start_pos, num_photons, omit_bottom=False, single_step=
     :param num_photons: Number of photons to simulate
     :param omit_bottom: Flag to omit all photons exiting from the bottom of the medium. Default is `False`.
     :param single_step: Flag to only propagate photon for one step. Default is `False`.
-    :param bottom_reflection: Flag to set whether photons are able to reflect from the bottom of the medium.
     :return: List of Photon objects. Omitted and absorbed photons are filtered out.
     """
-    photons = [single_sim(medium, start_pos, omit_bottom, single_step, bottom_reflection) for _ in range(num_photons)]
+    photons = [single_sim(medium, start_pos, omit_bottom, single_step) for _ in range(num_photons)]
     photons = list(filter(None, photons))
 
     return photons
 
 
-def single_sim(medium, start_pos, omit_bottom=False, single_step=False, bottom_reflection=True):
+def single_sim(medium, start_pos, omit_bottom=False, single_step=False):
     """
     Simulate a single photon propagating through a medium
     :param medium: Medium object
     :param start_pos: Position the photon is starting from. Must be within the Medium as defined in Medium.shape
     :param omit_bottom: Flag to omit all photons exiting from the bottom of the medium. Default is `False`.
     :param single_step: Flag to only propagate photon for one step. Default is `False`.
-    :param bottom_reflection: Flag to set whether photons are able to reflect from the bottom of the medium.
     :return: Photon object or `None` if photon is omitted or absorbed
     """
-
-    if bottom_reflection is True:
-        photon = Photon(start_pos, medium)
-    else:
-        class Photon_(Photon):
-            def is_reflected(self):
-                if self.new_pos[2] < 0:
-                    return True
-                else:
-                    return super().is_reflected()
-
-        photon = Photon_(start_pos, medium)
+    photon = Photon(start_pos, medium)
 
     if single_step is True:
         photon.propagate(omit_bottom)
@@ -142,11 +128,11 @@ def plot_exit_angle_distribution(photons):
     return fig
 
 
-def plot_photons(photons, objective=None, show_aperture=False, cones=False):
+def plot_photons(photons, objective, show_aperture=False, cones=False):
     """
     Plot positions of photons in 3-D. Colours accepted photons in green and rejected photons in red.
     :param photons: List of Photon objects
-    :param objective: Optional argument. Required when `show_aperture=True`. Objective object.
+    :param objective: Objective object
     :param show_aperture: Flag to plot circle representing front aperture of objective. Default is `False`.
     :param cones: Flag to plot photons as dots or cones (indicating propagation direction). Default is `False`.
     :return: Plotly Figure object.
@@ -265,8 +251,6 @@ def plot_photons(photons, objective=None, show_aperture=False, cones=False):
             )
 
     if show_aperture:
-        if objective is None:
-            return ValueError('Please provide an Objective object.')
         # Show objective aperture
         aperture_z = (np.cos(objective.theta) * objective.working_distance + objective.sample_thickness) * np.ones(
             (50, 50))
