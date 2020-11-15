@@ -26,6 +26,12 @@ class Medium:
         self.N_e = n_e
         self.g = g
 
+        # TODO: Depth/wavelength dependent absorption
+        # https://www.osapublishing.org/boe/fulltext.cfm?uri=boe-9-8-3534&id=395109
+
+        # TODO: Temperature plots
+        # https://elifesciences.org/articles/53205 (Methods)
+
     # Path length calculation based on scattering length
     # Path length distribution follows Beer's law
     def get_path_length(self):
